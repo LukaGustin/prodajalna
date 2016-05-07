@@ -1,6 +1,7 @@
 //Priprava knjižnic
 var formidable = require("formidable");
 var util = require('util');
+var reg=0;
 
 if (!process.env.PORT)
   process.env.PORT = 8080;
@@ -209,21 +210,35 @@ streznik.post('/prijava', function(zahteva, odgovor) {
     	  Phone, Fax, Email, SupportRepId) \
         VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
       //TODO: add fields and finalize
-      //stmt.run("", "", "", "", "", "", "", "", "", "", "", 3); 
-      //stmt.finalize();
+      stmt.run(polja.FirstName, polja.LastName, polja.Company, polja.Address, polja.City, polja.State, polja.Country, polja.PostalCode, polja.Phone, polja.Fax, polja.Email, 3); 
+      stmt.finalize();
+      //polja.sporocilo="sadasd";
+      //console.log(polja.sporocilo);
+      //napaka2 = "registracija";
+      reg=1;
+      odgovor.redirect("/prijava");
     } catch (err) {
       napaka2 = true;
     }
-  
+    
     odgovor.end();
   });
 })
 
 // Prikaz strani za prijavo
 streznik.get('/prijava', function(zahteva, odgovor) {
+  var sporocilo="";
   vrniStranke(function(napaka1, stranke) {
       vrniRacune(function(napaka2, racuni) {
-        odgovor.render('prijava', {sporocilo: "", seznamStrank: stranke, seznamRacunov: racuni});  
+        //console.log(reg);
+        if(reg==1) {
+          if(napaka2) sporocilo="Prišlo je do napake pri registraciji nove stranke. Prosim preverite vnešene podatke in poskusite znova."
+          else sporocilo="Stranka je bila uspešno registrirana."
+          reg=0;
+        } 
+        //if(!napaka2) sporocilo="Stranka je bila uspešno registrirana."
+        //else sporocilo="Prišlo je do napake pri registraciji nove stranke."
+        odgovor.render('prijava', {sporocilo: sporocilo, seznamStrank: stranke, seznamRacunov: racuni});  
       }) 
     });
 })
