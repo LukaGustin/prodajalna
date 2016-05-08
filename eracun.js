@@ -183,9 +183,9 @@ streznik.get('/izpisiRacun/:oblika', function(zahteva, odgovor) {
       odgovor.render('eslog', {
         vizualiziraj: zahteva.params.oblika == 'html' ? true : false,
         postavkeRacuna: pesmi
-      })  
+      });  
     }
-  })
+  });
 })
 
 // Privzeto izpiši račun v HTML obliki
