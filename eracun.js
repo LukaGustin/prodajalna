@@ -232,7 +232,7 @@ streznik.get('/prijava', function(zahteva, odgovor) {
       vrniRacune(function(napaka2, racuni) {
         //console.log(reg);
         if(reg==1) {
-          if(napaka2) sporocilo="Prišlo je do napake pri registraciji nove stranke. Prosim preverite vnešene podatke in poskusite znova."
+          if(napaka2 || napaka1) sporocilo="Prišlo je do napake pri registraciji nove stranke. Prosim preverite vnešene podatke in poskusite znova."
           else sporocilo="Stranka je bila uspešno registrirana."
           reg=0;
         } 
