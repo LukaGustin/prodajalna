@@ -133,7 +133,7 @@ var pesmiIzRacuna = function(racunId, callback) {
     Track.TrackId IN (SELECT InvoiceLine.TrackId FROM InvoiceLine, Invoice \
     WHERE InvoiceLine.InvoiceId = Invoice.InvoiceId AND Invoice.InvoiceId = " + racunId + ")",
     function(napaka, vrstice) {
-      console.log(vrstice);
+      callback(napaka, vrstice);
     })
 }
 
@@ -142,7 +142,7 @@ var strankaIzRacuna = function(racunId, callback) {
     pb.all("SELECT Customer.* FROM Customer, Invoice \
             WHERE Customer.CustomerId = Invoice.CustomerId AND Invoice.InvoiceId = " + racunId,
     function(napaka, vrstice) {
-      console.log(vrstice);
+      callback(napaka, vrstice);
     })
 }
 
@@ -160,14 +160,29 @@ streznik.get('/izpisiRacun/:oblika', function(zahteva, odgovor) {
       odgovor.send("<p>V košarici nimate nobene pesmi, \
         zato računa ni mogoče pripraviti!</p>");
     } else {
-      odgovor.setHeader('content-type', 'text/xml');
-      odgovor.render('eslog', {
-        vizualiziraj: zahteva.params.oblika == 'html' ? true : false,
-        postavkeRacuna: pesmi
-      })  
+      trenutnaStranka(zahteva.session.strankaID, function(napaka, strankaID){
+        console.log(zahteva.session.strankaID);
+        if(!napaka) {
+          odgovor.setHeader('content-type', 'text/xml');
+          odgovor.render('eslog', {
+          vizualiziraj: zahteva.params.oblika == 'html' ? true : false,
+          postavkeRacuna: pesmi,
+          strankaRacuna: strankaID[0]
+          })
+        } else {
+          odgovor.sendStatus(500);
+        }
+      })
+      
     }
   })
 })
+
+var trenutnaStranka = function(strankaID, callback) {
+  pb.all("Select * from Customer where Customer.CustomerId = " + strankaID, function(napaka, vrstice) {
+    callback(napaka, vrstice);
+  })
+}
 
 // Privzeto izpiši račun v HTML obliki
 streznik.get('/izpisiRacun', function(zahteva, odgovor) {
@@ -233,6 +248,7 @@ streznik.post('/stranka', function(zahteva, odgovor) {
   var form = new formidable.IncomingForm();
   
   form.parse(zahteva, function (napaka1, polja, datoteke) {
+    zahteva.session.strankaID = polja.seznamStrank
     odgovor.redirect('/')
   });
 })
