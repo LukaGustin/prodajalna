@@ -17,7 +17,7 @@ streznik.set('view engine', 'ejs');
 streznik.use(express.static('public'));
 streznik.use(
   expressSession({
-    secret: '1234567890QWERTY', // Skrivni ključ za podpisovanje piškotkov
+    secret: '1234567890QWERTY', // Skrivni ključ za podpisovanje piškotkov  
     saveUninitialized: true,    // Novo sejo shranimo
     resave: false,              // Ne zahtevamo ponovnega shranjevanja
     cookie: {
